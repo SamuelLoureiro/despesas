@@ -1,6 +1,9 @@
+// ignore_for_file: deprecated_member_use, prefer_const_constructors, unnecessary_string_interpolations
+
 import 'package:expenses/components/transaction_form.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
+// ignore: duplicate_import
 import 'components/transaction_form.dart';
 import 'components/transaction_list.dart';
 import 'components/chart.dart';
@@ -60,8 +63,8 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _transactions = [];
   Verba _verbainicial = Verba(id: '1', value: 0);
   double valueTotal = 0.0;
-  String nome='Nome de usuário';
-  String email='email@exemplo.com';
+  String nome = 'Nome de usuário';
+  String email = 'email@exemplo.com';
 
   List<Transaction> get _recentTransactions {
     return _transactions.where((tr) {
@@ -140,25 +143,40 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
+
   _addDados(String name, String eemail) {
     setState(() {
-      nome=name;
-      email=eemail;
+      nome = name;
+      email = eemail;
     });
 
     Navigator.of(context).pop();
   }
 
- _openDadosForm(BuildContext context) {
-  showModalBottomSheet(
-    context: context,
-    builder: (_) {
-      return DadosForm(_addDados);
-    },
-  );
-  return; // Adicione este return aqui
-}
-  
+  _openDadosForm(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) {
+        return DadosForm(_addDados);
+      },
+    );
+    return; // Adicione este return aqui
+  }
+
+  String disponivel(double _verbainicial, double _meta, double valueTotal) {
+    if (_verbainicial == 0.0 || _meta == 0.0) {
+      return 'R\$$_verbainicial';
+    } else if (_verbainicial - (_meta + valueTotal) <= 0.1 * _verbainicial &&
+        _verbainicial - (_meta + valueTotal) > 0) {
+      return 'R\$${_verbainicial - (_meta + valueTotal)} [Você está gastando mais do que deveria!]';
+    } else if (_verbainicial - (_meta + valueTotal) > 0.1 * _verbainicial) {
+      return 'R\$${_verbainicial - (_meta + valueTotal)} [É melhor economizar!]';
+    } else if (_verbainicial - (_meta + valueTotal) == 0) {
+      return 'R\$${_verbainicial - (_meta + valueTotal)}';
+    } else {
+      return 'Você gastou tudo o que podia!';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -177,7 +195,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-             UserAccountsDrawerHeader(
+            UserAccountsDrawerHeader(
               accountName: Text('$nome'),
               accountEmail: Text('$email'),
               currentAccountPicture: CircleAvatar(
@@ -189,20 +207,18 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             TextButton(
-  onPressed: () {
-    setState(() {
-      _openDadosForm(context);
-    });
-  },
-  child: Text('Alterar dados'),
-),
-            ListTile(
-              title: Text('Salve dinheiro'),
-              leading: Icon(Icons.save),
-              onTap: () {
-                // Adicione aqui a ação que deseja executar ao pressionar o item Salve dinheiro do menu
+              onPressed: () {
+                setState(() {
+                  _openDadosForm(context);
+                });
               },
-              subtitle:Text('R\$ ${_meta.value-valueTotal}'),
+              child: Text('Alterar dados'),
+            ),
+            ListTile(
+              title: Text('Orçamento'),
+              leading: Icon(Icons.attach_money),
+              onTap: () => openVerbaForm(context),
+              subtitle: Text('R\$ ${_verbainicial.value}'),
             ),
             ListTile(
               title: Text('Meta da semana'),
@@ -211,10 +227,10 @@ class _MyHomePageState extends State<MyHomePage> {
               subtitle: Text('R\$ ${_meta.value}'),
             ),
             ListTile(
-              title: Text('Orçamento'),
-              leading: Icon(Icons.attach_money),
-              onTap: () => openVerbaForm(context),
-              subtitle: Text('R\$ ${_verbainicial.value}'),
+              title: Text('Pode gastar'),
+              leading: Icon(Icons.save),
+              subtitle: Text(
+                  disponivel(_verbainicial.value, _meta.value, valueTotal)),
             ),
           ],
         ),

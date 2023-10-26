@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 
 class MetaForm extends StatefulWidget {
@@ -36,7 +38,7 @@ class _MetaFormState extends State<MetaForm> {
                   const TextInputType.numberWithOptions(decimal: true),
               onSubmitted: (_) => _submitForm(),
               decoration: const InputDecoration(
-                labelText: 'Valor (R\$)',
+                labelText: 'Valor (R\$):',
               ),
             ),
             Row(
